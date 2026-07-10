@@ -28,30 +28,30 @@ public class FlightStatusService : IFlightStatusService
         return MergeResponses(aeroTrackResponse, quickFlightResponse);
     }
 
-    public FlightStatus NormalizeStatus(string? providerStatus, string providerName)
+    public FlightStatus.Api.Models.FlightStatus NormalizeStatus(string? providerStatus, string providerName)
     {
         if (string.IsNullOrWhiteSpace(providerStatus))
-            return FlightStatus.Unknown;
+            return FlightStatus.Api.Models.FlightStatus.Unknown;
 
         return providerName.ToLower() switch
         {
             "aerotrack" => providerStatus.ToLower() switch
             {
-                "on time" => FlightStatus.OnTime,
-                "delayed" => FlightStatus.Delayed,
-                "cancelled" => FlightStatus.Cancelled,
-                "diverted" => FlightStatus.Diverted,
-                _ => FlightStatus.Unknown
+                "on time" => FlightStatus.Api.Models.FlightStatus.OnTime,
+                "delayed" => FlightStatus.Api.Models.FlightStatus.Delayed,
+                "cancelled" => FlightStatus.Api.Models.FlightStatus.Cancelled,
+                "diverted" => FlightStatus.Api.Models.FlightStatus.Diverted,
+                _ => FlightStatus.Api.Models.FlightStatus.Unknown
             },
             "quickflight" => providerStatus.ToUpper() switch
             {
-                "ON_TIME" => FlightStatus.OnTime,
-                "DELAYED" => FlightStatus.Delayed,
-                "CANCELLED" => FlightStatus.Cancelled,
-                "DIVERTED" => FlightStatus.Diverted,
-                _ => FlightStatus.Unknown
+                "ON_TIME" => FlightStatus.Api.Models.FlightStatus.OnTime,
+                "DELAYED" => FlightStatus.Api.Models.FlightStatus.Delayed,
+                "CANCELLED" => FlightStatus.Api.Models.FlightStatus.Cancelled,
+                "DIVERTED" => FlightStatus.Api.Models.FlightStatus.Diverted,
+                _ => FlightStatus.Api.Models.FlightStatus.Unknown
             },
-            _ => FlightStatus.Unknown
+            _ => FlightStatus.Api.Models.FlightStatus.Unknown
         };
     }
 
@@ -64,7 +64,7 @@ public class FlightStatusService : IFlightStatusService
             {
                 FlightNumber = "Unknown",
                 Date = "Unknown",
-                Status = FlightStatus.Unknown,
+                Status = FlightStatus.Api.Models.FlightStatus.Unknown,
                 NormalizedStatus = "Unknown",
                 ScheduledDepartureUtc = DateTime.UtcNow,
                 ScheduledArrivalUtc = DateTime.UtcNow,
@@ -106,10 +106,10 @@ public class FlightStatusService : IFlightStatusService
         var status = NormalizeStatus(selectedResponse.Status, sourceProvider);
         var normalizedStatusString = status switch
         {
-            FlightStatus.OnTime => "On Time",
-            FlightStatus.Delayed => "Delayed",
-            FlightStatus.Cancelled => "Cancelled",
-            FlightStatus.Diverted => "Diverted",
+            FlightStatus.Api.Models.FlightStatus.OnTime => "On Time",
+            FlightStatus.Api.Models.FlightStatus.Delayed => "Delayed",
+            FlightStatus.Api.Models.FlightStatus.Cancelled => "Cancelled",
+            FlightStatus.Api.Models.FlightStatus.Diverted => "Diverted",
             _ => "Unknown"
         };
 
