@@ -13,11 +13,11 @@
       <app-error-display *ngIf="error && !loading" [message]="error"></app-error-display>
 
       <app-status-card 
-        *ngIf="flightStatus && !loading && !error" 
+        *ngIf="(flightStatus && flightStatus.status !== 'Unknown') && !loading && !error" 
         [result]="flightStatus"
       ></app-status-card>
 
-      <div *ngIf="searched && !flightStatus && !loading && !error" class="no-results">
+      <div *ngIf="searched && !loading && !error && (!flightStatus || flightStatus.status === 'Unknown')" class="no-results">
         <p>No results found. Please try again.</p>
       </div>
     </div>

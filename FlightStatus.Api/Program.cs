@@ -1,6 +1,7 @@
 using FlightStatus.Api.Models;
 using FlightStatus.Api.Services;
 using FlightStatus.Api.Providers;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IFlightStatusService, FlightStatusService>();
 builder.Services.AddScoped<IFlightStatusProvider, AeroTrackStub>();
 builder.Services.AddScoped<IFlightStatusProvider, QuickFlightStub>();
+
+// Configure JSON serialization to use enum names
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.WriteIndented = true;
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 // Add CORS
 builder.Services.AddCors(options =>
