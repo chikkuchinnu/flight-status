@@ -1,6 +1,4 @@
 using FlightStatus.Api.Models;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace FlightStatus.Api.Providers;
 
@@ -8,98 +6,89 @@ public class AeroTrackStub : IFlightStatusProvider
 {
     public string ProviderName => "AeroTrack";
 
+    // Dummy data list with all flight statuses
+    private static readonly List<AeroTrackResponse> _dummyFlights = new()
+    {
+        new AeroTrackResponse
+        {
+            FlightNumber = "AA100",
+            Date = "2024-01-15",
+            Status = "On Time",
+            ScheduledDepartureUtc = new DateTime(2024, 1, 15, 10, 0, 0, DateTimeKind.Utc),
+            ActualDepartureUtc = new DateTime(2024, 1, 15, 10, 5, 0, DateTimeKind.Utc),
+            ScheduledArrivalUtc = new DateTime(2024, 1, 15, 14, 30, 0, DateTimeKind.Utc),
+            ActualArrivalUtc = new DateTime(2024, 1, 15, 14, 35, 0, DateTimeKind.Utc),
+            DepartureTerminal = "T1",
+            DepartureGate = "A5",
+            DelayReason = null,
+            LastUpdatedUtc = DateTime.UtcNow
+        },
+        new AeroTrackResponse
+        {
+            FlightNumber = "BA200",
+            Date = "2024-01-16",
+            Status = "Delayed",
+            ScheduledDepartureUtc = new DateTime(2024, 1, 16, 8, 30, 0, DateTimeKind.Utc),
+            ActualDepartureUtc = new DateTime(2024, 1, 16, 9, 15, 0, DateTimeKind.Utc),
+            ScheduledArrivalUtc = new DateTime(2024, 1, 16, 12, 0, 0, DateTimeKind.Utc),
+            ActualArrivalUtc = new DateTime(2024, 1, 16, 12, 50, 0, DateTimeKind.Utc),
+            DepartureTerminal = "T2",
+            DepartureGate = "B12",
+            DelayReason = "Weather conditions",
+            LastUpdatedUtc = DateTime.UtcNow
+        },
+        new AeroTrackResponse
+        {
+            FlightNumber = "UA300",
+            Date = "2024-01-17",
+            Status = "Cancelled",
+            ScheduledDepartureUtc = new DateTime(2024, 1, 17, 15, 45, 0, DateTimeKind.Utc),
+            ActualDepartureUtc = null,
+            ScheduledArrivalUtc = new DateTime(2024, 1, 17, 19, 15, 0, DateTimeKind.Utc),
+            ActualArrivalUtc = null,
+            DepartureTerminal = "T3",
+            DepartureGate = null,
+            DelayReason = "Crew unavailable",
+            LastUpdatedUtc = DateTime.UtcNow
+        },
+        new AeroTrackResponse
+        {
+            FlightNumber = "DL400",
+            Date = "2024-01-18",
+            Status = "Diverted",
+            ScheduledDepartureUtc = new DateTime(2024, 1, 18, 11, 20, 0, DateTimeKind.Utc),
+            ActualDepartureUtc = new DateTime(2024, 1, 18, 11, 15, 0, DateTimeKind.Utc),
+            ScheduledArrivalUtc = new DateTime(2024, 1, 18, 15, 50, 0, DateTimeKind.Utc),
+            ActualArrivalUtc = new DateTime(2024, 1, 18, 16, 20, 0, DateTimeKind.Utc),
+            DepartureTerminal = "T1",
+            DepartureGate = "C8",
+            DelayReason = "Emergency landing required",
+            LastUpdatedUtc = DateTime.UtcNow
+        },
+        new AeroTrackResponse
+        {
+            FlightNumber = "LH500",
+            Date = "2024-01-19",
+            Status = null,
+            ScheduledDepartureUtc = new DateTime(2024, 1, 19, 6, 0, 0, DateTimeKind.Utc),
+            ActualDepartureUtc = new DateTime(2024, 1, 19, 6, 8, 0, DateTimeKind.Utc),
+            ScheduledArrivalUtc = new DateTime(2024, 1, 19, 10, 30, 0, DateTimeKind.Utc),
+            ActualArrivalUtc = new DateTime(2024, 1, 19, 10, 38, 0, DateTimeKind.Utc),
+            DepartureTerminal = "T4",
+            DepartureGate = "D15",
+            DelayReason = null,
+            LastUpdatedUtc = DateTime.UtcNow
+        }
+    };
+
     public Task<ProviderResponse?> GetFlightStatusAsync(string flightNumber, string date)
     {
-        // Deterministic scenario selection
-        var scenario = GetScenario(flightNumber, date);
-        
-        var baseDate = DateTime.ParseExact(date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.AssumeUniversal);
-        var scheduledDeparture = baseDate.AddHours(10);
-        var scheduledArrival = baseDate.AddHours(14).AddMinutes(30);
+        // Try to find exact match in dummy data
+        var flight = _dummyFlights.FirstOrDefault(f => 
+            f.FlightNumber.Equals(flightNumber, StringComparison.OrdinalIgnoreCase) && 
+            f.Date == date);
 
-        AeroTrackResponse response = scenario switch
-        {
-            0 => new AeroTrackResponse
-            {
-                FlightNumber = flightNumber,
-                Date = date,
-                Status = "On Time",
-                ScheduledDepartureUtc = scheduledDeparture,
-                ActualDepartureUtc = scheduledDeparture.AddMinutes(10),
-                ScheduledArrivalUtc = scheduledArrival,
-                ActualArrivalUtc = scheduledArrival.AddMinutes(8),
-                DepartureTerminal = "T1",
-                DepartureGate = "A5",
-                DelayReason = null,
-                LastUpdatedUtc = DateTime.UtcNow
-            },
-            1 => new AeroTrackResponse
-            {
-                FlightNumber = flightNumber,
-                Date = date,
-                Status = "Delayed",
-                ScheduledDepartureUtc = scheduledDeparture,
-                ActualDepartureUtc = scheduledDeparture.AddMinutes(45),
-                ScheduledArrivalUtc = scheduledArrival,
-                ActualArrivalUtc = scheduledArrival.AddMinutes(50),
-                DepartureTerminal = "T1",
-                DepartureGate = "B2",
-                DelayReason = "Weather conditions",
-                LastUpdatedUtc = DateTime.UtcNow
-            },
-            2 => new AeroTrackResponse
-            {
-                FlightNumber = flightNumber,
-                Date = date,
-                Status = "Cancelled",
-                ScheduledDepartureUtc = scheduledDeparture,
-                ActualDepartureUtc = null,
-                ScheduledArrivalUtc = scheduledArrival,
-                ActualArrivalUtc = null,
-                DepartureTerminal = "T2",
-                DepartureGate = null,
-                DelayReason = "Crew unavailable",
-                LastUpdatedUtc = DateTime.UtcNow
-            },
-            3 => new AeroTrackResponse
-            {
-                FlightNumber = flightNumber,
-                Date = date,
-                Status = "Diverted",
-                ScheduledDepartureUtc = scheduledDeparture,
-                ActualDepartureUtc = scheduledDeparture.AddMinutes(-5),
-                ScheduledArrivalUtc = scheduledArrival,
-                ActualArrivalUtc = baseDate.AddHours(15).AddMinutes(20),
-                DepartureTerminal = "T1",
-                DepartureGate = "C3",
-                DelayReason = "Unscheduled diversion",
-                LastUpdatedUtc = DateTime.UtcNow
-            },
-            _ => new AeroTrackResponse
-            {
-                FlightNumber = flightNumber,
-                Date = date,
-                Status = null,
-                ScheduledDepartureUtc = scheduledDeparture,
-                ActualDepartureUtc = scheduledDeparture.AddMinutes(8),
-                ScheduledArrivalUtc = scheduledArrival,
-                ActualArrivalUtc = scheduledArrival.AddMinutes(5),
-                DepartureTerminal = "T3",
-                DepartureGate = "D1",
-                DelayReason = null,
-                LastUpdatedUtc = DateTime.UtcNow
-            }
-        };
-
-        return Task.FromResult<ProviderResponse?>(response);
-    }
-
-    private int GetScenario(string flightNumber, string date)
-    {
-        var combined = flightNumber + date;
-        using var sha = SHA256.Create();
-        var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(combined));
-        var hashValue = BitConverter.ToUInt32(hash, 0);
-        return (int)(hashValue % 5);
+        // Return null if no data found
+        return Task.FromResult<ProviderResponse?>(flight);
     }
 }
