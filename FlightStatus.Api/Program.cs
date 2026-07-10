@@ -2,7 +2,7 @@ using FlightStatus.Api.Models;
 using FlightStatus.Api.Services;
 using FlightStatus.Api.Providers;
 
-var builder = WebApplicationBuilder.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services
 builder.Services.AddScoped<IFlightStatusService, FlightStatusService>();
@@ -14,7 +14,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("http://localhost:3000")
+        builder.WithOrigins("http://localhost:4200")
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
@@ -22,11 +22,10 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
 app.UseCors();
 
 // GET /flights/status?flightNumber={code}&date={yyyy-MM-dd}
-app.MapGet("/flights/status", async (string? flightNumber, string? date, IFlightStatusService service) =>
+app.MapGet("/flights/status", async Task<IResult> (string? flightNumber, string? date, IFlightStatusService service) =>
 {
     if (string.IsNullOrWhiteSpace(flightNumber) || string.IsNullOrWhiteSpace(date))
     {
