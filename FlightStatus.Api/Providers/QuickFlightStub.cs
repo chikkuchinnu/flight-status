@@ -1,6 +1,4 @@
 using FlightStatus.Api.Models;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace FlightStatus.Api.Providers;
 
@@ -8,83 +6,74 @@ public class QuickFlightStub : IFlightStatusProvider
 {
     public string ProviderName => "QuickFlight";
 
+    // Dummy data list with all flight statuses
+    private static readonly List<QuickFlightResponse> _dummyFlights = new()
+    {
+        new QuickFlightResponse
+        {
+            FlightNumber = "AA100",
+            Date = "2024-01-15",
+            Status = "ON_TIME",
+            ScheduledDepartureUtc = new DateTime(2024, 1, 15, 10, 0, 0, DateTimeKind.Utc),
+            ActualDepartureUtc = new DateTime(2024, 1, 15, 10, 2, 0, DateTimeKind.Utc),
+            ScheduledArrivalUtc = new DateTime(2024, 1, 15, 14, 30, 0, DateTimeKind.Utc),
+            ActualArrivalUtc = new DateTime(2024, 1, 15, 14, 28, 0, DateTimeKind.Utc),
+            LastUpdatedUtc = DateTime.UtcNow.AddMinutes(-10)
+        },
+        new QuickFlightResponse
+        {
+            FlightNumber = "BA200",
+            Date = "2024-01-16",
+            Status = "DELAYED",
+            ScheduledDepartureUtc = new DateTime(2024, 1, 16, 8, 30, 0, DateTimeKind.Utc),
+            ActualDepartureUtc = null,
+            ScheduledArrivalUtc = new DateTime(2024, 1, 16, 12, 0, 0, DateTimeKind.Utc),
+            ActualArrivalUtc = null,
+            LastUpdatedUtc = DateTime.UtcNow.AddMinutes(-5)
+        },
+        new QuickFlightResponse
+        {
+            FlightNumber = "UA300",
+            Date = "2024-01-17",
+            Status = "CANCELLED",
+            ScheduledDepartureUtc = new DateTime(2024, 1, 17, 15, 45, 0, DateTimeKind.Utc),
+            ActualDepartureUtc = null,
+            ScheduledArrivalUtc = new DateTime(2024, 1, 17, 19, 15, 0, DateTimeKind.Utc),
+            ActualArrivalUtc = null,
+            LastUpdatedUtc = DateTime.UtcNow.AddMinutes(-30)
+        },
+        new QuickFlightResponse
+        {
+            FlightNumber = "DL400",
+            Date = "2024-01-18",
+            Status = "DIVERTED",
+            ScheduledDepartureUtc = new DateTime(2024, 1, 18, 11, 20, 0, DateTimeKind.Utc),
+            ActualDepartureUtc = new DateTime(2024, 1, 18, 11, 18, 0, DateTimeKind.Utc),
+            ScheduledArrivalUtc = new DateTime(2024, 1, 18, 15, 50, 0, DateTimeKind.Utc),
+            ActualArrivalUtc = null,
+            LastUpdatedUtc = DateTime.UtcNow.AddMinutes(-15)
+        },
+        new QuickFlightResponse
+        {
+            FlightNumber = "LH500",
+            Date = "2024-01-19",
+            Status = null,
+            ScheduledDepartureUtc = new DateTime(2024, 1, 19, 6, 0, 0, DateTimeKind.Utc),
+            ActualDepartureUtc = null,
+            ScheduledArrivalUtc = new DateTime(2024, 1, 19, 10, 30, 0, DateTimeKind.Utc),
+            ActualArrivalUtc = null,
+            LastUpdatedUtc = DateTime.UtcNow.AddMinutes(-45)
+        }
+    };
+
     public Task<ProviderResponse?> GetFlightStatusAsync(string flightNumber, string date)
     {
-        // Deterministic scenario selection
-        var scenario = GetScenario(flightNumber, date);
-        
-        var baseDate = DateTime.ParseExact(date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.AssumeUniversal);
-        var scheduledDeparture = baseDate.AddHours(10);
-        var scheduledArrival = baseDate.AddHours(14).AddMinutes(30);
+        // Try to find exact match in dummy data
+        var flight = _dummyFlights.FirstOrDefault(f => 
+            f.FlightNumber.Equals(flightNumber, StringComparison.OrdinalIgnoreCase) && 
+            f.Date == date);
 
-        QuickFlightResponse response = scenario switch
-        {
-            0 => new QuickFlightResponse
-            {
-                FlightNumber = flightNumber,
-                Date = date,
-                Status = "ON_TIME",
-                ScheduledDepartureUtc = scheduledDeparture,
-                ActualDepartureUtc = null,
-                ScheduledArrivalUtc = scheduledArrival,
-                ActualArrivalUtc = null,
-                LastUpdatedUtc = DateTime.UtcNow.AddMinutes(-15)
-            },
-            1 => new QuickFlightResponse
-            {
-                FlightNumber = flightNumber,
-                Date = date,
-                Status = "DELAYED",
-                ScheduledDepartureUtc = scheduledDeparture,
-                ActualDepartureUtc = null,
-                ScheduledArrivalUtc = scheduledArrival,
-                ActualArrivalUtc = null,
-                LastUpdatedUtc = DateTime.UtcNow.AddMinutes(-20)
-            },
-            2 => new QuickFlightResponse
-            {
-                FlightNumber = flightNumber,
-                Date = date,
-                Status = "CANCELLED",
-                ScheduledDepartureUtc = scheduledDeparture,
-                ActualDepartureUtc = null,
-                ScheduledArrivalUtc = scheduledArrival,
-                ActualArrivalUtc = null,
-                LastUpdatedUtc = DateTime.UtcNow.AddMinutes(-30)
-            },
-            3 => new QuickFlightResponse
-            {
-                FlightNumber = flightNumber,
-                Date = date,
-                Status = "DIVERTED",
-                ScheduledDepartureUtc = scheduledDeparture,
-                ActualDepartureUtc = null,
-                ScheduledArrivalUtc = scheduledArrival,
-                ActualArrivalUtc = null,
-                LastUpdatedUtc = DateTime.UtcNow.AddMinutes(-25)
-            },
-            _ => new QuickFlightResponse
-            {
-                FlightNumber = flightNumber,
-                Date = date,
-                Status = null,
-                ScheduledDepartureUtc = scheduledDeparture,
-                ActualDepartureUtc = null,
-                ScheduledArrivalUtc = scheduledArrival,
-                ActualArrivalUtc = null,
-                LastUpdatedUtc = DateTime.UtcNow.AddMinutes(-40)
-            }
-        };
-
-        return Task.FromResult<ProviderResponse?>(response);
-    }
-
-    private int GetScenario(string flightNumber, string date)
-    {
-        var combined = flightNumber + date;
-        using var sha = SHA256.Create();
-        var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(combined));
-        var hashValue = BitConverter.ToUInt32(hash, 0);
-        return (int)(hashValue % 5);
+        // Return null if no data found
+        return Task.FromResult<ProviderResponse?>(flight);
     }
 }
