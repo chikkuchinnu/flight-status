@@ -1,0 +1,54 @@
+<div *ngIf="result" [class]="'status-card ' + getStatusClass(result.status)">
+  <div class="card-header">
+    <h2 class="flight-number">{{ result.flightNumber }}</h2>
+    <span [class]="'status-badge ' + getStatusBadgeClass(result.status)">
+      {{ result.normalizedStatus }}
+    </span>
+  </div>
+
+  <div class="card-body">
+    <div class="info-grid">
+      <div class="info-item">
+        <label>Date</label>
+        <p>{{ result.date }}</p>
+      </div>
+      <div class="info-item">
+        <label>Scheduled Departure</label>
+        <p>{{ formatDateTime(result.scheduledDepartureUtc) }}</p>
+      </div>
+      <div *ngIf="result.actualDepartureUtc" class="info-item">
+        <label>Actual Departure</label>
+        <p>{{ formatDateTime(result.actualDepartureUtc) }}</p>
+      </div>
+      <div class="info-item">
+        <label>Scheduled Arrival</label>
+        <p>{{ formatDateTime(result.scheduledArrivalUtc) }}</p>
+      </div>
+      <div *ngIf="result.actualArrivalUtc" class="info-item">
+        <label>Actual Arrival</label>
+        <p>{{ formatDateTime(result.actualArrivalUtc) }}</p>
+      </div>
+
+      <!-- AeroTrack-specific fields -->
+      <div *ngIf="result.departureTerminal" class="info-item">
+        <label>Departure Terminal</label>
+        <p>{{ result.departureTerminal }}</p>
+      </div>
+      <div *ngIf="result.departureGate" class="info-item">
+        <label>Departure Gate</label>
+        <p>{{ result.departureGate }}</p>
+      </div>
+      <div *ngIf="result.delayReason" class="info-item">
+        <label>Delay Reason</label>
+        <p>{{ result.delayReason }}</p>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <div class="meta-info">
+        <span class="provider">📊 Source: {{ result.sourceProvider }}</span>
+        <span class="updated">🕐 Updated: {{ formatDateTime(result.lastUpdatedUtc) }}</span>
+      </div>
+    </div>
+  </div>
+</div>

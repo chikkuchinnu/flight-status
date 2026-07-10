@@ -1,0 +1,29 @@
+<div class="app-container">
+  <header class="app-header">
+    <h1>✈️ Flight Status Lookup</h1>
+    <p>Real-time flight information from SkyRoute</p>
+  </header>
+
+  <main class="app-main">
+    <app-search-form (search)="onSearch($event)" (reset)="onReset()"></app-search-form>
+
+    <div class="results-container">
+      <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+      <app-error-display *ngIf="error && !loading" [message]="error"></app-error-display>
+
+      <app-status-card 
+        *ngIf="flightStatus && !loading && !error" 
+        [result]="flightStatus"
+      ></app-status-card>
+
+      <div *ngIf="searched && !flightStatus && !loading && !error" class="no-results">
+        <p>No results found. Please try again.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <p>&copy; 2024 SkyRoute Platform. All rights reserved.</p>
+  </footer>
+</div>

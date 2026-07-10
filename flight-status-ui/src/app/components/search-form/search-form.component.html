@@ -1,0 +1,40 @@
+<div class="search-form-container">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="search-form">
+    <div class="form-group">
+      <label for="flightNumber">Flight Number</label>
+      <input
+        id="flightNumber"
+        type="text"
+        formControlName="flightNumber"
+        placeholder="e.g., SK100, BA200"
+        class="form-input"
+      />
+      <div *ngIf="flightNumber?.invalid && flightNumber?.touched" class="error-message">
+        <p *ngIf="flightNumber?.errors?.['required']">Flight number is required</p>
+        <p *ngIf="flightNumber?.errors?.['minlength']">Flight number must be at least 2 characters</p>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="date">Date</label>
+      <input
+        id="date"
+        type="date"
+        formControlName="date"
+        class="form-input"
+      />
+      <div *ngIf="date?.invalid && date?.touched" class="error-message">
+        <p *ngIf="date?.errors?.['required']">Date is required</p>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" [disabled]="form.invalid" class="btn btn-primary">
+        Search
+      </button>
+      <button type="button" (click)="onReset()" class="btn btn-secondary">
+        Reset
+      </button>
+    </div>
+  </form>
+</div>
