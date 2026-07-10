@@ -1,0 +1,34 @@
+.gitignore
+# Backend
+FlightStatus.Api/bin/
+FlightStatus.Api/obj/
+FlightStatus.Api/.vs/
+FlightStatus.Api/.vscode/
+FlightStatus.Api/*.user
+FlightStatus.Api/*.suo
+
+# Tests
+FlightStatus.Tests/bin/
+FlightStatus.Tests/obj/
+
+# Frontend
+flight-status-ui/node_modules/
+flight-status-ui/dist/
+flight-status-ui/.angular/
+flight-status-ui/.env.local
+flight-status-ui/.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+*.log.*
