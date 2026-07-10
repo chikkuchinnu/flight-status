@@ -57,20 +57,25 @@ public class FlightStatusService : IFlightStatusService
 
     public FlightStatusResult MergeResponses(ProviderResponse? aeroTrack, ProviderResponse? quickFlight)
     {
-        // If neither provider has data
+        // If neither provider has data, return empty result
         if (aeroTrack == null && quickFlight == null)
         {
             return new FlightStatusResult
             {
-                FlightNumber = "Unknown",
-                Date = "Unknown",
+                FlightNumber = null,
+                Date = null,
                 Status = FlightStatus.Api.Models.FlightStatus.Unknown,
-                NormalizedStatus = "Unknown",
-                ScheduledDepartureUtc = DateTime.UtcNow,
-                ScheduledArrivalUtc = DateTime.UtcNow,
-                LastUpdatedUtc = DateTime.UtcNow,
-                SourceProvider = "None",
-                Message = "No data available from any provider"
+                NormalizedStatus = null,
+                ScheduledDepartureUtc = null,
+                ActualDepartureUtc = null,
+                ScheduledArrivalUtc = null,
+                ActualArrivalUtc = null,
+                DepartureTerminal = null,
+                DepartureGate = null,
+                DelayReason = null,
+                LastUpdatedUtc = null,
+                SourceProvider = null,
+                Message = "No flight data found"
             };
         }
 
